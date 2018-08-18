@@ -1,0 +1,18 @@
+{
+  "name": "aws-dynamodb-copy",
+  "version": "1.0.0",
+  "description": "An utility for copying an AWS DynamoDB table.",
+  "main": "index.js",
+  "keywords": [
+    "aws",
+    "dynamodb",
+    "copy"
+  ],
+  "author": "Sami Jaktholm <sjakthol@outlook.com>",
+  "license": "MIT",
+  "dependencies": {
+    "aws-sdk": "^2.295.0",
+    "highland": "^2.13.0",
+    "yargs": "^12.0.1"
+  }
+}
