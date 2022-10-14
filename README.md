@@ -15,8 +15,8 @@ sustain the given rate per second.
 * `--rate` / `-r` - Number of items to copy per second.
 
 ## Performance
-The script is able to provide a sustained rate of at least 10000 copies per second (running
-on an `m5.large` instance). Higher rates have not been tested.
+The script is able to provide a sustained rate of at least 20000 copies per second (running
+on an `c5.xlarge` instance).
 
 ## Improvement Ideas:
 * Support copying tables across AWS regions
