@@ -34,7 +34,7 @@ const PARTITION_KEY = args.partitionKey
 
 let item = 0
 hi(function (push, next) {
-  push(null, { [PARTITION_KEY]: { S: (item++).toString() }, value: { S: crypto.randomBytes(8).toString('hex') }})
+  push(null, { [PARTITION_KEY]: { S: (item++).toString() }, value: { S: crypto.randomBytes(8).toString('hex') } })
   if (item >= NUM_ITEMS) push(null, hi.nil)
   else next()
 })
