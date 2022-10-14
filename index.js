@@ -11,10 +11,20 @@ function run () {
       desc: 'The source table to copy from',
       required: true
     })
+    .option('source-table-region', {
+      desc: 'AWS region that hosts the source table',
+      default: null,
+      defaultDescription: 'Current region'
+    })
     .option('target-table', {
       alias: 't',
       desc: 'The target table to copy to',
       required: true
+    })
+    .option('target-table-region', {
+      desc: 'AWS region that hosts the tager table',
+      default: null,
+      defaultDescription: 'Current region'
     })
     .option('rate', {
       alias: 'r',
@@ -27,22 +37,24 @@ function run () {
       default: 20
     }).argv
 
-  const RATE_LIMIT = parseInt(args.rate)
-  const SCAN_SEGMENTS = parseInt(args.parallelism)
-  const SOURCE_TABLE = args.sourceTable
-  const TARGET_TABLE = args.targetTable
+  const rate = parseInt(args.rate)
+  const parallelism = parseInt(args.parallelism)
+  const sourceTable = args.sourceTable
+  const sourceTableRegion = args.sourceTableRegion || undefined
+  const targetTable = args.targetTable
+  const targetTableRegion = args.targetTableRegion || undefined
 
   const generators = []
-  for (let i = 0; i < SCAN_SEGMENTS; ++i) {
+  for (let i = 0; i < parallelism; ++i) {
     generators.push(hi(ddb.createScanner({
       Segment: i,
-      TableName: SOURCE_TABLE,
-      TotalSegments: SCAN_SEGMENTS
-    })))
+      TableName: sourceTable,
+      TotalSegments: parallelism
+    }, { region: sourceTableRegion })))
   }
   return hi(generators)
     .merge()
-    .through(ddb.createStreamWriter(TARGET_TABLE, RATE_LIMIT))
+    .through(ddb.createStreamWriter(targetTable, rate, { region: targetTableRegion }))
     .through(utils.createStreamThroughputReporter('output'))
     .collect()
     .toPromise(Promise)
