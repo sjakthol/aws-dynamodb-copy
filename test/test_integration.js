@@ -13,6 +13,7 @@ const {
   CloudFormationClient,
   CreateStackCommand,
   DeleteStackCommand,
+  DescribeStacksCommand,
   waitUntilStackCreateComplete
 } = require('@aws-sdk/client-cloudformation')
 const ddb = require('../lib/ddb')
@@ -32,7 +33,8 @@ async function createTestResources () {
   const cmd = new CreateStackCommand({
     StackName,
     OnFailure: 'DELETE',
-    TemplateBody
+    TemplateBody,
+    Capabilities: ['CAPABILITY_NAMED_IAM']
   })
   const stack = await cfn.send(cmd).catch(function (err) {
     if (err.message === 'Region is missing') {
@@ -92,6 +94,33 @@ describe('integration test', function () {
     await ddb.fillTable(testSourceTable, 10, 10, 'pk')
 
     process.argv = ['node', 'index.js', '--source-table', testSourceTable, '--target-table', testTargetTable, '--rate', '10', '--parallelism', '20']
+    const index = require('../index')
+    await await index.run()
+
+    const targetItems = await hi(ddb.createScanner({
+      TableName: testTargetTable
+    })).collect().toPromise(Promise)
+
+    expect(targetItems).to.have.lengthOf(10)
+  })
+
+  it('should assume roles if provided', async function () {
+    await ddb.fillTable(testSourceTable, 10, 10, 'pk')
+
+    const res = await cfn.send(new DescribeStacksCommand({ StackName }))
+    const stackDetails = res.Stacks[0]
+    const writeRoleArn = stackDetails.Outputs.find(output => output.OutputKey === 'WriteRoleArn').OutputValue
+    const scanRoleArn = stackDetails.Outputs.find(output => output.OutputKey === 'ScanRoleArn').OutputValue
+
+    process.argv = [
+      'node', 'index.js',
+      '--source-table', testSourceTable,
+      '--source-table-role-arn', scanRoleArn,
+      '--target-table', testTargetTable,
+      '--target-table-role-arn', writeRoleArn + 1,
+      '--rate', '10',
+      '--parallelism', '20'
+    ]
     const index = require('../index')
     await await index.run()
 

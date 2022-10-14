@@ -16,6 +16,11 @@ function run () {
       default: null,
       defaultDescription: 'Current region'
     })
+    .option('source-table-role-arn', {
+      desc: 'ARN of AWS IAM Role to assume for reading from the source table',
+      default: null,
+      defaultDescription: 'No role (use default credentials)'
+    })
     .option('target-table', {
       alias: 't',
       desc: 'The target table to copy to',
@@ -25,6 +30,11 @@ function run () {
       desc: 'AWS region that hosts the tager table',
       default: null,
       defaultDescription: 'Current region'
+    })
+    .option('target-table-role-arn', {
+      desc: 'ARN of AWS IAM Role to assume for writing to the target table',
+      default: null,
+      defaultDescription: 'No role (use default credentials)'
     })
     .option('rate', {
       alias: 'r',
@@ -41,8 +51,10 @@ function run () {
   const parallelism = parseInt(args.parallelism)
   const sourceTable = args.sourceTable
   const sourceTableRegion = args.sourceTableRegion || undefined
+  const sourceTableRoleArn = args.sourceTableRoleArn || undefined
   const targetTable = args.targetTable
   const targetTableRegion = args.targetTableRegion || undefined
+  const targetTableRoleArn = args.targetTableRoleArn || undefined
 
   const generators = []
   for (let i = 0; i < parallelism; ++i) {
@@ -50,11 +62,11 @@ function run () {
       Segment: i,
       TableName: sourceTable,
       TotalSegments: parallelism
-    }, { region: sourceTableRegion })))
+    }, { region: sourceTableRegion, role: sourceTableRoleArn })))
   }
   return hi(generators)
     .merge()
-    .through(ddb.createStreamWriter(targetTable, rate, { region: targetTableRegion }))
+    .through(ddb.createStreamWriter(targetTable, rate, { region: targetTableRegion, role: targetTableRoleArn }))
     .through(utils.createStreamThroughputReporter('output'))
     .collect()
     .toPromise(Promise)

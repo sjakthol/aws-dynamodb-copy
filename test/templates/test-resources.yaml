@@ -125,3 +125,56 @@ Resources:
         ScaleOutCooldown: 60
         PredefinedMetricSpecification:
           PredefinedMetricType: DynamoDBReadCapacityUtilization
+
+  # IAM Roles
+  ScanRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !Ref AWS::AccountId
+            Action: sts:AssumeRole
+      Description: IAM Role for scanning source table for aws-dynamodb-copy
+      RoleName: !Sub ${AWS::StackName}-ScanRole
+      Policies:
+      - PolicyName: DynamoDBAccess
+        PolicyDocument:
+          Version: 2012-10-17
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:Scan
+              Resource:
+                - !Sub arn:aws:dynamodb:*:${AWS::AccountId}:table/*
+
+  WriteRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !Ref AWS::AccountId
+            Action: sts:AssumeRole
+      Description: IAM Role for writing items to target table for aws-dynamodb-copy
+      RoleName: !Sub ${AWS::StackName}-WriteRole
+      Policies:
+      - PolicyName: DynamoDBAccess
+        PolicyDocument:
+          Version: 2012-10-17
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:BatchWriteItem
+              Resource:
+                - !Sub arn:aws:dynamodb:*:${AWS::AccountId}:table/*
+
+Outputs:
+  ScanRoleArn:
+    Value: !GetAtt ScanRole.Arn
+  WriteRoleArn:
+    Value: !GetAtt WriteRole.Arn
