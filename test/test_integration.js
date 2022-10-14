@@ -91,6 +91,9 @@ describe('integration test', function () {
   })
 
   it('should copy table contents', async function () {
+    if (stacks.length === 0) {
+      return this.skip()
+    }
     await ddb.fillTable(testSourceTable, 10, 10, 'pk')
 
     process.argv = ['node', 'index.js', '--source-table', testSourceTable, '--target-table', testTargetTable, '--rate', '10', '--parallelism', '20']
@@ -105,6 +108,9 @@ describe('integration test', function () {
   })
 
   it('should assume roles if provided', async function () {
+    if (stacks.length === 0) {
+      return this.skip()
+    }
     await ddb.fillTable(testSourceTable, 10, 10, 'pk')
 
     const res = await cfn.send(new DescribeStacksCommand({ StackName }))
