@@ -1,9 +1,6 @@
 'use strict'
 
-const crypto = require('crypto')
-const hi = require('highland')
 const ddb = require('../lib/ddb')
-const utils = require('../lib/utils')
 
 const args = require('yargs')
   .option('target-table', {
@@ -27,20 +24,8 @@ const args = require('yargs')
     required: true
   }).argv
 
-const TARGET_TABLE = args.targetTable
-const NUM_ITEMS = parseInt(args.numItems)
-const RATE_LIMIT = parseInt(args.rate)
-const PARTITION_KEY = args.partitionKey
+async function main () {
+  await ddb.fillTable(args.targetTable, parseInt(args.numItems), parseInt(args.rate), args.partitionKey)
+}
 
-let item = 0
-hi(function (push, next) {
-  push(null, { [PARTITION_KEY]: { S: (item++).toString() }, value: { S: crypto.randomBytes(8).toString('hex') } })
-  if (item >= NUM_ITEMS) push(null, hi.nil)
-  else next()
-})
-  .through(ddb.createStreamWriter(TARGET_TABLE, RATE_LIMIT))
-  .through(utils.createStreamThroughputReporter('output'))
-  .collect()
-  .toCallback(function (err, res) {
-    console.log(err, 'Done')
-  })
+main().then(res => console.log('Done'), err => console.error(err, 'Done'))
