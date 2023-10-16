@@ -24,7 +24,7 @@
     "yargs": "^17.7.2"
   },
   "devDependencies": {
-    "@aws-sdk/client-cloudformation": "^3.427.0",
+    "@aws-sdk/client-cloudformation": "^3.428.0",
     "c8": "^8.0.1",
     "chai": "^4.3.10",
     "dirty-chai": "^2.0.1",
