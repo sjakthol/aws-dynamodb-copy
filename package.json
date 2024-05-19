@@ -2,7 +2,8 @@
   "name": "aws-dynamodb-copy",
   "version": "1.0.0",
   "description": "An utility for copying an AWS DynamoDB table.",
-  "main": "index.js",
+  "type": "module",
+  "script": "index.js",
   "keywords": [
     "aws",
     "dynamodb",
@@ -27,14 +28,12 @@
   "devDependencies": {
     "@aws-sdk/client-cloudformation": "^3.577.0",
     "c8": "^9.1.0",
-    "chai": "^4.4.1",
-    "dirty-chai": "^2.0.1",
+    "chai": "^5.1.1",
     "eslint": "^9.3.0",
     "eslint-config-prettier": "^9.1.0",
     "mocha": "^10.4.0",
     "mock-stdin": "^1.0.0",
     "prettier": "^3.2.5",
-    "sinon": "^17.0.1",
-    "sinon-chai": "^3.7.0"
+    "sinon": "^18.0.0"
   }
 }

@@ -1,11 +1,17 @@
 "use strict";
 
-const hi = require("highland");
-const ddb = require("./lib/ddb");
-const utils = require("./lib/utils");
+import { pathToFileURL } from "url";
+import { realpathSync } from "fs";
+
+import yargs from "yargs";
+import { hideBin } from "yargs/helpers";
+import hi from "highland";
+
+import ddb from "./lib/ddb.js";
+import utils from "./lib/utils.js";
 
 function run() {
-  const args = require("yargs")
+  const args = yargs(hideBin(process.argv))
     .option("source-table", {
       alias: "s",
       desc: "The source table to copy from",
@@ -85,11 +91,11 @@ function run() {
 }
 
 /* istanbul ignore next */
-if (require.main === module) {
+if (import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href) {
   run().then(
     (res) => console.log("Done"),
     (err) => console.error(err, "Done"),
   );
 }
 
-module.exports = { run };
+export { run };
