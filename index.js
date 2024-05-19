@@ -1,80 +1,95 @@
-'use strict'
+"use strict";
 
-const hi = require('highland')
-const ddb = require('./lib/ddb')
-const utils = require('./lib/utils')
+const hi = require("highland");
+const ddb = require("./lib/ddb");
+const utils = require("./lib/utils");
 
-function run () {
-  const args = require('yargs')
-    .option('source-table', {
-      alias: 's',
-      desc: 'The source table to copy from',
-      required: true
+function run() {
+  const args = require("yargs")
+    .option("source-table", {
+      alias: "s",
+      desc: "The source table to copy from",
+      required: true,
     })
-    .option('source-table-region', {
-      desc: 'AWS region that hosts the source table',
+    .option("source-table-region", {
+      desc: "AWS region that hosts the source table",
       default: null,
-      defaultDescription: 'Current region'
+      defaultDescription: "Current region",
     })
-    .option('source-table-role-arn', {
-      desc: 'ARN of AWS IAM Role to assume for reading from the source table',
+    .option("source-table-role-arn", {
+      desc: "ARN of AWS IAM Role to assume for reading from the source table",
       default: null,
-      defaultDescription: 'No role (use default credentials)'
+      defaultDescription: "No role (use default credentials)",
     })
-    .option('target-table', {
-      alias: 't',
-      desc: 'The target table to copy to',
-      required: true
+    .option("target-table", {
+      alias: "t",
+      desc: "The target table to copy to",
+      required: true,
     })
-    .option('target-table-region', {
-      desc: 'AWS region that hosts the tager table',
+    .option("target-table-region", {
+      desc: "AWS region that hosts the tager table",
       default: null,
-      defaultDescription: 'Current region'
+      defaultDescription: "Current region",
     })
-    .option('target-table-role-arn', {
-      desc: 'ARN of AWS IAM Role to assume for writing to the target table',
+    .option("target-table-role-arn", {
+      desc: "ARN of AWS IAM Role to assume for writing to the target table",
       default: null,
-      defaultDescription: 'No role (use default credentials)'
+      defaultDescription: "No role (use default credentials)",
     })
-    .option('rate', {
-      alias: 'r',
-      desc: 'Number of items to copy per second',
-      required: true
+    .option("rate", {
+      alias: "r",
+      desc: "Number of items to copy per second",
+      required: true,
     })
-    .option('parallelism', {
-      alias: 'p',
-      desc: 'Number of segments for DynamoDB parallel scan',
-      default: 20
-    }).argv
+    .option("parallelism", {
+      alias: "p",
+      desc: "Number of segments for DynamoDB parallel scan",
+      default: 20,
+    }).argv;
 
-  const rate = parseInt(args.rate)
-  const parallelism = parseInt(args.parallelism)
-  const sourceTable = args.sourceTable
-  const sourceTableRegion = args.sourceTableRegion || undefined
-  const sourceTableRoleArn = args.sourceTableRoleArn || undefined
-  const targetTable = args.targetTable
-  const targetTableRegion = args.targetTableRegion || undefined
-  const targetTableRoleArn = args.targetTableRoleArn || undefined
+  const rate = parseInt(args.rate);
+  const parallelism = parseInt(args.parallelism);
+  const sourceTable = args.sourceTable;
+  const sourceTableRegion = args.sourceTableRegion || undefined;
+  const sourceTableRoleArn = args.sourceTableRoleArn || undefined;
+  const targetTable = args.targetTable;
+  const targetTableRegion = args.targetTableRegion || undefined;
+  const targetTableRoleArn = args.targetTableRoleArn || undefined;
 
-  const generators = []
+  const generators = [];
   for (let i = 0; i < parallelism; ++i) {
-    generators.push(hi(ddb.createScanner({
-      Segment: i,
-      TableName: sourceTable,
-      TotalSegments: parallelism
-    }, { region: sourceTableRegion, role: sourceTableRoleArn })))
+    generators.push(
+      hi(
+        ddb.createScanner(
+          {
+            Segment: i,
+            TableName: sourceTable,
+            TotalSegments: parallelism,
+          },
+          { region: sourceTableRegion, role: sourceTableRoleArn },
+        ),
+      ),
+    );
   }
   return hi(generators)
     .merge()
-    .through(ddb.createStreamWriter(targetTable, rate, { region: targetTableRegion, role: targetTableRoleArn }))
-    .through(utils.createStreamThroughputReporter('output'))
+    .through(
+      ddb.createStreamWriter(targetTable, rate, {
+        region: targetTableRegion,
+        role: targetTableRoleArn,
+      }),
+    )
+    .through(utils.createStreamThroughputReporter("output"))
     .collect()
-    .toPromise(Promise)
+    .toPromise(Promise);
 }
 
 /* istanbul ignore next */
 if (require.main === module) {
-  run().then(res => console.log('Done'), err => console.error(err, 'Done'))
+  run().then(
+    (res) => console.log("Done"),
+    (err) => console.error(err, "Done"),
+  );
 }
 
-module.exports = { run }
+module.exports = { run };

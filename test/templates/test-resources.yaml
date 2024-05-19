@@ -16,7 +16,7 @@ Resources:
         WriteCapacityUnits: 10
       TableName: !Sub ${AWS::StackName}-SourceTable
       Tags:
-        - { Key: Name, Value: !Sub '${AWS::StackName}-SourceTable' }
+        - { Key: Name, Value: !Sub "${AWS::StackName}-SourceTable" }
 
   SourceTableWriteCapacityUnitsScalableTarget:
     Type: "AWS::ApplicationAutoScaling::ScalableTarget"
@@ -78,7 +78,7 @@ Resources:
         WriteCapacityUnits: 10
       TableName: !Sub ${AWS::StackName}-TargetTable
       Tags:
-        - { Key: Name, Value: !Sub '${AWS::StackName}-TargetTable' }
+        - { Key: Name, Value: !Sub "${AWS::StackName}-TargetTable" }
 
   TargetTableWriteCapacityUnitsScalableTarget:
     Type: "AWS::ApplicationAutoScaling::ScalableTarget"
@@ -131,7 +131,7 @@ Resources:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
-        Version: '2012-10-17'
+        Version: "2012-10-17"
         Statement:
           - Effect: Allow
             Principal:
@@ -140,21 +140,21 @@ Resources:
       Description: IAM Role for scanning source table for aws-dynamodb-copy
       RoleName: !Sub ${AWS::StackName}-ScanRole
       Policies:
-      - PolicyName: DynamoDBAccess
-        PolicyDocument:
-          Version: 2012-10-17
-          Statement:
-            - Effect: Allow
-              Action:
-                - dynamodb:Scan
-              Resource:
-                - !Sub arn:aws:dynamodb:*:${AWS::AccountId}:table/*
+        - PolicyName: DynamoDBAccess
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:Scan
+                Resource:
+                  - !Sub arn:aws:dynamodb:*:${AWS::AccountId}:table/*
 
   WriteRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
-        Version: '2012-10-17'
+        Version: "2012-10-17"
         Statement:
           - Effect: Allow
             Principal:
@@ -163,15 +163,15 @@ Resources:
       Description: IAM Role for writing items to target table for aws-dynamodb-copy
       RoleName: !Sub ${AWS::StackName}-WriteRole
       Policies:
-      - PolicyName: DynamoDBAccess
-        PolicyDocument:
-          Version: 2012-10-17
-          Statement:
-            - Effect: Allow
-              Action:
-                - dynamodb:BatchWriteItem
-              Resource:
-                - !Sub arn:aws:dynamodb:*:${AWS::AccountId}:table/*
+        - PolicyName: DynamoDBAccess
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:BatchWriteItem
+                Resource:
+                  - !Sub arn:aws:dynamodb:*:${AWS::AccountId}:table/*
 
 Outputs:
   ScanRoleArn:
