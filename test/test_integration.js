@@ -6,7 +6,8 @@ import crypto from "crypto";
 import hi from "highland";
 import fs from "fs";
 import { fileURLToPath } from "url";
-import path, { dirname } from "path";
+import path from "path";
+import { dirname } from "path";
 import {
   CloudFormationClient,
   CreateStackCommand,
