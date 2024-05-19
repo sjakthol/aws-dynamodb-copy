@@ -1,7 +1,7 @@
-const fs = require("fs");
-const config = require("eslint-config-prettier");
+import fs from "fs";
+import config from "eslint-config-prettier";
 
-module.exports = [
+export default [
   {
     ignores: fs.readFileSync(".gitignore", "utf8").split("\n"),
   },

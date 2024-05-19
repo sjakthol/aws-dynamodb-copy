@@ -2,7 +2,8 @@
   "name": "aws-dynamodb-copy",
   "version": "1.0.0",
   "description": "An utility for copying an AWS DynamoDB table.",
-  "main": "index.js",
+  "type": "module",
+  "script": "index.js",
   "keywords": [
     "aws",
     "dynamodb",

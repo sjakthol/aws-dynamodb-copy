@@ -1,22 +1,20 @@
 /* eslint-env mocha */
-const chai = require("chai");
-const expect = chai.expect;
-const sinon = require("sinon");
-chai.use(require("sinon-chai"));
-chai.use(require("dirty-chai"));
+import { expect } from "chai";
+import sinon from "sinon";
 
-const crypto = require("crypto");
-const hi = require("highland");
-const fs = require("fs");
-const path = require("path");
-const {
+import crypto from "crypto";
+import hi from "highland";
+import fs from "fs";
+import { fileURLToPath } from "url";
+import path, { dirname } from "path";
+import {
   CloudFormationClient,
   CreateStackCommand,
   DeleteStackCommand,
   DescribeStacksCommand,
   waitUntilStackCreateComplete,
-} = require("@aws-sdk/client-cloudformation");
-const ddb = require("../lib/ddb");
+} from "@aws-sdk/client-cloudformation";
+import ddb from "../lib/ddb.js";
 
 const RUN_ID = Date.now() + "-" + crypto.randomBytes(4).toString("hex");
 const StackName = `aws-dynamodb-copy-${RUN_ID}-${crypto.randomBytes(4).toString("hex")}`;
@@ -29,6 +27,8 @@ const stacks = [];
 async function createTestResources() {
   console.error(`Creating stack ${StackName}`);
 
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = dirname(__filename);
   const TemplateBody = fs.readFileSync(path.join(__dirname, "templates", "test-resources.yaml"), { encoding: "utf-8" });
   const cmd = new CreateStackCommand({
     StackName,
@@ -73,10 +73,6 @@ describe("integration test", function () {
     await createTestResources();
   });
 
-  beforeEach(() => {
-    delete require.cache[require.resolve("../index")];
-  });
-
   afterEach(async () => {
     process.argv = origArgv;
     sandbox.reset();
@@ -113,7 +109,7 @@ describe("integration test", function () {
       "--parallelism",
       "20",
     ];
-    const index = require("../index");
+    const index = await import(`../index.js?version=${Date.now() + Math.random()}`);
     await await index.run();
 
     const targetItems = await hi(
@@ -148,13 +144,13 @@ describe("integration test", function () {
       "--target-table",
       testTargetTable,
       "--target-table-role-arn",
-      writeRoleArn + 1,
+      writeRoleArn,
       "--rate",
       "10",
       "--parallelism",
       "20",
     ];
-    const index = require("../index");
+    const index = await import(`../index.js?version=${Date.now() + Math.random()}`);
     await await index.run();
 
     const targetItems = await hi(
