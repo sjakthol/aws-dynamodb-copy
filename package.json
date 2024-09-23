@@ -20,8 +20,8 @@
   "author": "Sami Jaktholm <sjakthol@outlook.com>",
   "license": "MIT",
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.651.1",
-    "@aws-sdk/credential-providers": "^3.651.1",
+    "@aws-sdk/client-dynamodb": "^3.656.0",
+    "@aws-sdk/credential-providers": "^3.654.0",
     "highland": "^2.13.5",
     "yargs": "^17.7.2"
   },
