@@ -26,10 +26,10 @@
     "yargs": "^17.7.2"
   },
   "devDependencies": {
-    "@aws-sdk/client-cloudformation": "^3.687.0",
+    "@aws-sdk/client-cloudformation": "^3.693.0",
     "c8": "^10.1.2",
     "chai": "^5.1.1",
-    "eslint": "^9.14.0",
+    "eslint": "^9.15.0",
     "eslint-config-prettier": "^9.1.0",
     "mocha": "^10.8.2",
     "mock-stdin": "^1.0.0",
